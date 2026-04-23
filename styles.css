@@ -1,0 +1,96 @@
+:root {
+  color-scheme: dark;
+  font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(160deg, #1f2240 0%, #351836 100%);
+  color: #f6f6ff;
+}
+
+.game {
+  width: min(900px, 100% - 2rem);
+  margin: 1.5rem auto;
+  padding: 1rem;
+  border: 1px solid #ffffff30;
+  border-radius: 14px;
+  background: #0f1026cc;
+}
+
+.game__header h1 {
+  margin: 0;
+}
+
+.scene {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.scene__image {
+  width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: #00000055;
+  border: 1px solid #ffffff22;
+}
+
+.status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+button {
+  border: none;
+  background: #ff89b8;
+  color: #1a1230;
+  font-weight: 700;
+  padding: 0.6rem 0.9rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(1.05);
+}
+
+.dialogue {
+  border: 1px solid #ffffff33;
+  border-radius: 12px;
+  padding: 1rem;
+  background: #202450cc;
+}
+
+.dialogue h2 {
+  margin-top: 0;
+}
+
+.dialogue p {
+  min-height: 4.5em;
+  line-height: 1.7;
+}
+
+.choices {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.choice {
+  width: 100%;
+  text-align: left;
+  border-radius: 10px;
+  background: #87b8ff;
+}
+
+.game__footer {
+  margin-top: 0.8rem;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
