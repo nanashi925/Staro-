@@ -10,87 +10,118 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: linear-gradient(160deg, #1f2240 0%, #351836 100%);
+  background: radial-gradient(circle at top, #34386f 0%, #181728 65%);
   color: #f6f6ff;
 }
 
 .game {
-  width: min(900px, 100% - 2rem);
-  margin: 1.5rem auto;
+  width: min(960px, 100% - 1.5rem);
+  margin: 1rem auto;
   padding: 1rem;
-  border: 1px solid #ffffff30;
-  border-radius: 14px;
-  background: #0f1026cc;
 }
 
 .game__header h1 {
   margin: 0;
 }
 
-.scene {
-  display: grid;
-  gap: 0.8rem;
+.stage {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #ffffff3a;
+  background: #0d0f26;
 }
 
-.scene__image {
+.stage__image {
   width: 100%;
-  max-height: 420px;
+  height: min(72vh, 680px);
   object-fit: contain;
-  border-radius: 12px;
-  background: #00000055;
-  border: 1px solid #ffffff22;
+  display: block;
+  background: linear-gradient(120deg, #161636 0%, #2f1937 100%);
 }
 
-.status {
+.hud {
+  position: absolute;
+  top: 0.8rem;
+  left: 0.8rem;
+  right: 0.8rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-button {
-  border: none;
-  background: #ff89b8;
-  color: #1a1230;
-  font-weight: 700;
-  padding: 0.6rem 0.9rem;
+  padding: 0.45rem 0.75rem;
   border-radius: 999px;
-  cursor: pointer;
+  background: #040611bf;
+  border: 1px solid #ffffff30;
 }
 
-button:hover {
-  filter: brightness(1.05);
+.dialogue-box {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  padding: 1rem 1.2rem;
+  background: linear-gradient(to top, #06070ff8 30%, #06070fae 100%);
+  border-top: 1px solid #ffffff33;
 }
 
-.dialogue {
-  border: 1px solid #ffffff33;
-  border-radius: 12px;
-  padding: 1rem;
-  background: #202450cc;
+.dialogue-box h2 {
+  margin: 0 0 0.4rem;
+  font-size: 1.2rem;
 }
 
-.dialogue h2 {
-  margin-top: 0;
-}
-
-.dialogue p {
-  min-height: 4.5em;
+.dialogue-box p {
+  margin: 0;
+  min-height: 4.8em;
   line-height: 1.7;
 }
 
 .choices {
+  margin-top: 0.9rem;
   display: grid;
-  gap: 0.6rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+#bgm-toggle {
+  border-radius: 999px;
+  padding: 0.45rem 0.85rem;
+  background: #ffa6c8;
+  color: #281931;
 }
 
 .choice {
-  width: 100%;
-  text-align: left;
   border-radius: 10px;
-  background: #87b8ff;
+  padding: 0.8rem;
+  text-align: left;
+  background: #96bcff;
+  color: #1b1a34;
+  min-height: 3.4rem;
+}
+
+.choice:hover,
+#bgm-toggle:hover {
+  filter: brightness(1.06);
 }
 
 .game__footer {
-  margin-top: 0.8rem;
-  font-size: 0.9rem;
+  margin-top: 0.65rem;
   opacity: 0.9;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 720px) {
+  .choices {
+    grid-template-columns: 1fr;
+  }
+
+  .stage__image {
+    height: 65vh;
+  }
 }

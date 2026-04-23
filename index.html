@@ -10,32 +10,34 @@
     <main class="game">
       <header class="game__header">
         <h1>S太郎ルート</h1>
-        <p>不憫なオッサンとお嬢ちゃんの、ちょっと騒がしい乙女ゲーム風ミニノベル</p>
+        <p>乙女ゲーム風ミニノベル</p>
       </header>
 
-      <section class="scene">
+      <section class="stage">
         <img
           id="character-image"
-          class="scene__image"
+          class="stage__image"
           src="./assets/images/s_taro.png"
           alt="S太郎の立ち絵"
         />
 
-        <div class="status">
+        <div class="hud">
           <p>信頼度: <span id="trust">0</span></p>
           <button id="bgm-toggle" type="button">BGM再生</button>
         </div>
 
-        <article class="dialogue">
+        <article class="dialogue-box">
           <h2 id="speaker">S太郎</h2>
           <p id="line"></p>
         </article>
+      </section>
 
+      <section>
         <div id="choices" class="choices"></div>
       </section>
 
       <footer class="game__footer">
-        <p>画像は <code>assets/images/</code>、音楽は <code>assets/music/</code> に置けばそのまま利用できます。</p>
+        <p>画像: <code>assets/images/</code> / 音楽: <code>assets/music/</code></p>
       </footer>
     </main>
 

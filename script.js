@@ -14,43 +14,74 @@ const state = {
 const scenes = {
   start: {
     speaker: "S太郎",
-    line: "おいおい、お嬢ちゃん。そんな勢いで飛び出したら危ねぇだろ。……って、待て待て待て！！ 俺の袖をロープ代わりにするな！",
+    line: "待て待て待て！！ お嬢ちゃん、作戦会議なしで特攻はダメだって！ 俺の胃が先にやられる！",
     choices: [
-      { text: "ごめん、でも一緒に行ってほしい", trust: 2, next: "routeA" },
-      { text: "平気だよ。ひとりで何とかする", trust: -1, next: "routeB" },
+      { text: "S太郎の袖をつかんで『一緒に来て』", trust: 2, next: "plan" },
+      { text: "『平気、ひとりで行ける』と強がる", trust: -1, next: "solo" },
+      { text: "『頭なでて落ち着かせて』と甘える", trust: 3, next: "care" },
+      { text: "『まず恋人さんに連絡しよう』と提案", trust: 1, next: "team" },
     ],
   },
-  routeA: {
+  plan: {
     speaker: "S太郎",
-    line: "……ったく、そう言われると放っとけねぇ。俺はお嬢ちゃんを守るだけじゃなく、隣で一緒に戦うって決めてんだ。",
+    line: "よし、そういう判断は大歓迎だ。お嬢ちゃんの覚悟は俺が知ってる。だからこそ、雑には使わせねぇ。",
     choices: [
-      { text: "頼りにしてる。背中、預けてもいい？", trust: 3, next: "end" },
-      { text: "やっぱり危ないから帰ってて", trust: -2, next: "end" },
+      { text: "『背中、預けてもいい？』", trust: 2, next: "end" },
+      { text: "『やっぱり先に突っ込む！』", trust: -2, next: "end" },
+      { text: "『S太郎が前、私が後ろで支援』", trust: 1, next: "end" },
+      { text: "『作戦、もう一回練る』", trust: 0, next: "start" },
     ],
   },
-  routeB: {
+  solo: {
     speaker: "S太郎",
-    line: "強がりか本気か、顔見りゃだいたい分かる。お嬢ちゃんは強い。でも今日は無茶の匂いがする。俺にも付き合わせろ。",
+    line: "お嬢ちゃんは強い。だがな、強い奴ほど一人で抱え込みやすいんだよ。俺にも面倒見させろ。",
     choices: [
-      { text: "……わかった。一緒に来て", trust: 2, next: "end" },
-      { text: "巻き込みたくない。ここで待ってて", trust: -2, next: "end" },
+      { text: "『……わかった、隣で戦って』", trust: 2, next: "end" },
+      { text: "『ごめん、今日は一人でやる』", trust: -2, next: "end" },
+      { text: "『じゃあ後ろから見守って』", trust: 0, next: "end" },
+      { text: "『やっぱり最初から相談する』", trust: 1, next: "start" },
+    ],
+  },
+  care: {
+    speaker: "S太郎",
+    line: "……ったく、そういう顔されると弱ぇんだよ俺は。よしよし。落ち着いたら次の手を決めるぞ。",
+    choices: [
+      { text: "『もうちょっとだけ甘えていい？』", trust: 2, next: "end" },
+      { text: "『ありがとう、もう行ける』", trust: 1, next: "end" },
+      { text: "『勢いで突撃する！』", trust: -2, next: "end" },
+      { text: "『恋人さんにも共有しよう』", trust: 1, next: "team" },
+    ],
+  },
+  team: {
+    speaker: "S太郎",
+    line: "その判断、いいねぇ。連携できる相手を信じるのは弱さじゃねぇ、賢さだ。俺も全力で合わせる。",
+    choices: [
+      { text: "『三人で行こう』", trust: 2, next: "end" },
+      { text: "『やっぱり二人で行こう』", trust: 1, next: "end" },
+      { text: "『私ひとりで行く』", trust: -2, next: "end" },
+      { text: "『最初から作戦を見直す』", trust: 0, next: "start" },
     ],
   },
   end: {
     speaker: "S太郎",
     line: () => {
-      if (state.trust >= 4) {
+      if (state.trust >= 5) {
         imageEl.src = "./assets/images/s_taro_happy.png";
-        return "よし、行くぞお嬢ちゃん。何が来ても俺がツッコんで、お前が突破する。……へへ、悪くねぇコンビだろ？";
+        return "よし決まりだ、お嬢ちゃん。俺がツッコんで道を作る、お前が突破する。並んで勝ちに行くぞ。";
       }
       if (state.trust >= 1) {
         imageEl.src = "./assets/images/s_taro.png";
-        return "ま、今回はこのくらいで勘弁してやる。次に暴走する時は、先に俺へ作戦書を出せ。いいな？";
+        return "今回はまあ合格点だ。無茶は減らせ、でも覚悟はそのままでいい。俺が隣にいる。";
       }
       imageEl.src = "./assets/images/s_taro_angry.png";
-      return "お嬢ちゃん！！ その突撃癖、マジで心臓に悪ぃ！ ……ったく、最後まで見捨てる気はねぇけどな。";
+      return "だから待てって言っただろお嬢ちゃん！！ ……ほんと世話が焼ける。でも最後まで付き合うからな。";
     },
-    choices: [{ text: "最初からやり直す", trust: 0, next: "start", reset: true }],
+    choices: [
+      { text: "もう一回プレイする", trust: 0, next: "start", reset: true },
+      { text: "別ルートを試す", trust: 0, next: "start", reset: true },
+      { text: "信頼度を0にしてやり直す", trust: 0, next: "start", reset: true },
+      { text: "S太郎にもう一度ツッコまれる", trust: 0, next: "start", reset: true },
+    ],
   },
 };
 
