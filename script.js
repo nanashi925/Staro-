@@ -3,7 +3,7 @@ const speakerEl = document.getElementById("speaker");
 const lineEl = document.getElementById("line");
 const choicesEl = document.getElementById("choices");
 const imageEl = document.getElementById("character-image");
-const stageEl = document.querySelector(".stage");
+const stageEl = document.querySelector(".hero");
 const bgm = document.getElementById("bgm");
 const bgmToggle = document.getElementById("bgm-toggle");
 
