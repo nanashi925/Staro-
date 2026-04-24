@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>S太郎ルート</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section id="home-screen" class="screen screen--home">
+        <aside class="home-left panel-gold">
+          <h1>S太郎<br /><span>- STARO -</span></h1>
+          <p class="subtitle">GAME MENU</p>
+          <button id="start-game" class="gold-btn" type="button">はじめから</button>
+          <button class="gold-btn" type="button">つづきから</button>
+          <button class="gold-btn" type="button">相棒の管理</button>
+          <button class="gold-btn" type="button">秘書の管理</button>
+          <button class="gold-btn" type="button">クレジット</button>
+        </aside>
+
+        <section class="home-center panel-gold">
+          <img id="home-image" class="hero-image" src="" alt="S太郎のホーム画像" />
+        </section>
+
+        <aside class="home-right">
+          <section class="panel-gold card">
+            <h3>- S太郎 PROFILE -</h3>
+            <p>年齢: 不明</p>
+            <p>職業: 美彩家</p>
+            <p>性格: 自信家 × 大人の余裕</p>
+          </section>
+          <section class="panel-gold card">
+            <h3>- STATUS -</h3>
+            <p>名声: ★★★★★</p>
+            <p>資産: ¥ 5,000,000,000</p>
+            <p>余裕: 100%</p>
+          </section>
+        </aside>
+      </section>
+
+      <section id="game-screen" class="screen screen--game is-hidden">
+        <section class="game-main panel-gold">
+          <img id="character-image" class="hero-image" src="" alt="S太郎の立ち絵" />
+
+          <div class="chapter-tag">- CHAPTER 1 - 邂逅</div>
+          <button id="back-home" class="menu-chip" type="button">MENU</button>
+
+          <article class="dialogue-box panel-gold-inner">
+            <h2 id="speaker">S太郎</h2>
+            <p id="line"></p>
+            <div id="choices" class="choices"></div>
+          </article>
+        </section>
+
+        <aside class="game-side">
+          <section class="panel-gold card">
+            <h3>- STATUS -</h3>
+            <p>信頼度: <span id="trust">0</span> / 100</p>
+            <button id="bgm-toggle" class="gold-btn" type="button">BGM再生</button>
+          </section>
+          <section class="panel-gold card">
+            <h3>- INFORMATION -</h3>
+            <p>S太郎はソファに深く腰掛け、
+              葉巻の煙をゆっくりと吐き出した。</p>
+          </section>
+          <section class="panel-gold card">
+            <h3>- LOG -</h3>
+            <p>選択で信頼度が変化する。</p>
+          </section>
+        </aside>
+      </section>
+    </main>
+
+    <audio id="bgm" src="./assets/music/bgm.mp3" loop></audio>
+    <script src="./script.js" defer></script>
+  </body>
+</html>
