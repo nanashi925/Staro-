@@ -2,117 +2,87 @@ const trustEl = document.getElementById("trust");
 const speakerEl = document.getElementById("speaker");
 const lineEl = document.getElementById("line");
 const choicesEl = document.getElementById("choices");
-const imageEl = document.getElementById("character-image");
-const stageEl = document.querySelector(".hero");
+const gameImageEl = document.getElementById("character-image");
+const homeImageEl = document.getElementById("home-image");
+const gameMainEl = document.querySelector(".game-main");
+const homeMainEl = document.querySelector(".home-center");
+const homeScreenEl = document.getElementById("home-screen");
+const gameScreenEl = document.getElementById("game-screen");
+const startGameBtn = document.getElementById("start-game");
+const backHomeBtn = document.getElementById("back-home");
 const bgm = document.getElementById("bgm");
 const bgmToggle = document.getElementById("bgm-toggle");
 
-const state = {
-  trust: 0,
-  current: "start",
-};
+const state = { trust: 0, current: "start" };
 
 const imageSets = {
-  normal: [
-    "./assets/images/S太郎-煙草.PNG",
-    "./assets/images/S太郎-口閉じスマイル.PNG",
-    "./assets/images/s_taro.png",
-    "./assets/images/s_taro.webp",
-    "./assets/images/s_taro.jpg",
-    "./assets/images/staro.png",
-    "./assets/images/S太郎.png",
-    "./assets/images/main.png",
-  ],
-  happy: [
-    "./assets/images/S太郎-口閉じスマイル.PNG",
-    "./assets/images/s_taro_happy.png",
-    "./assets/images/s_taro_smile.png",
-    "./assets/images/S太郎_happy.png",
-  ],
-  angry: [
-    "./assets/images/S太郎-煙草.PNG",
-    "./assets/images/s_taro_angry.png",
-    "./assets/images/s_taro_serious.png",
-    "./assets/images/S太郎_angry.png",
-  ],
+  normal: ["./assets/images/S太郎-煙草.PNG", "./assets/images/S太郎-口閉じスマイル.PNG", "./assets/images/s_taro.png"],
+  happy: ["./assets/images/S太郎-口閉じスマイル.PNG", "./assets/images/s_taro_happy.png"],
+  angry: ["./assets/images/S太郎-煙草.PNG", "./assets/images/s_taro_angry.png"],
 };
 
-const resolvedImages = {
-  normal: "",
-  happy: "",
-  angry: "",
-};
+const resolvedImages = { normal: "", happy: "", angry: "" };
 
 const scenes = {
   start: {
     speaker: "S太郎",
-    line: "待て待て待て！！ お嬢ちゃん、作戦会議なしで特攻はダメだって！ 俺の胃が先にやられる！",
+    line: "待たせたな。…で、俺に何の用だ？",
     choices: [
-      { text: "S太郎の袖をつかんで『一緒に来て』", trust: 2, next: "plan" },
-      { text: "『平気、ひとりで行ける』と強がる", trust: -1, next: "solo" },
-      { text: "『頭なでて落ち着かせて』と甘える", trust: 3, next: "care" },
-      { text: "『まず恋人さんに連絡しよう』と提案", trust: 1, next: "team" },
+      { text: "1. 仕事の依頼にきました。", trust: 2, next: "plan" },
+      { text: "2. あなたについて知りたい。", trust: 1, next: "care" },
+      { text: "3. 何でもありません。", trust: -1, next: "solo" },
+      { text: "4. …失礼します。", trust: -2, next: "end" },
     ],
   },
   plan: {
     speaker: "S太郎",
-    line: "よし、そういう判断は大歓迎だ。お嬢ちゃんの覚悟は俺が知ってる。だからこそ、雑には使わせねぇ。",
+    line: "仕事か。いいだろう。だが中途半端は嫌いだ。覚悟はあるな？",
     choices: [
-      { text: "『背中、預けてもいい？』", trust: 2, next: "end" },
-      { text: "『やっぱり先に突っ込む！』", trust: -2, next: "end" },
-      { text: "『S太郎が前、私が後ろで支援』", trust: 1, next: "end" },
-      { text: "『作戦、もう一回練る』", trust: 0, next: "start" },
+      { text: "覚悟はできています", trust: 2, next: "end" },
+      { text: "少し怖いです", trust: 1, next: "end" },
+      { text: "やっぱりやめます", trust: -2, next: "end" },
+      { text: "最初に戻る", trust: 0, next: "start" },
     ],
   },
   solo: {
     speaker: "S太郎",
-    line: "お嬢ちゃんは強い。だがな、強い奴ほど一人で抱え込みやすいんだよ。俺にも面倒見させろ。",
+    line: "…お嬢ちゃん、無茶はするな。待て待て待て！！ 俺の前では特にだ。",
     choices: [
-      { text: "『……わかった、隣で戦って』", trust: 2, next: "end" },
-      { text: "『ごめん、今日は一人でやる』", trust: -2, next: "end" },
-      { text: "『じゃあ後ろから見守って』", trust: 0, next: "end" },
-      { text: "『やっぱり最初から相談する』", trust: 1, next: "start" },
+      { text: "わかった。あなたを頼る", trust: 2, next: "end" },
+      { text: "ひとりで行く", trust: -2, next: "end" },
+      { text: "最初に戻る", trust: 0, next: "start" },
+      { text: "黙って頷く", trust: 1, next: "end" },
     ],
   },
   care: {
     speaker: "S太郎",
-    line: "……ったく、そういう顔されると弱ぇんだよ俺は。よしよし。落ち着いたら次の手を決めるぞ。",
+    line: "物好きだな。だが嫌いじゃない。聞きたいことがあるなら、座って話せ。",
     choices: [
-      { text: "『もうちょっとだけ甘えていい？』", trust: 2, next: "end" },
-      { text: "『ありがとう、もう行ける』", trust: 1, next: "end" },
-      { text: "『勢いで突撃する！』", trust: -2, next: "end" },
-      { text: "『恋人さんにも共有しよう』", trust: 1, next: "team" },
-    ],
-  },
-  team: {
-    speaker: "S太郎",
-    line: "その判断、いいねぇ。連携できる相手を信じるのは弱さじゃねぇ、賢さだ。俺も全力で合わせる。",
-    choices: [
-      { text: "『三人で行こう』", trust: 2, next: "end" },
-      { text: "『やっぱり二人で行こう』", trust: 1, next: "end" },
-      { text: "『私ひとりで行く』", trust: -2, next: "end" },
-      { text: "『最初から作戦を見直す』", trust: 0, next: "start" },
+      { text: "もっと知りたい", trust: 2, next: "end" },
+      { text: "十分です", trust: 1, next: "end" },
+      { text: "少し怖くなった", trust: -1, next: "end" },
+      { text: "最初に戻る", trust: 0, next: "start" },
     ],
   },
   end: {
     speaker: "S太郎",
     line: () => {
-      if (state.trust >= 5) {
-        imageEl.src = resolvedImages.happy || resolvedImages.normal;
-        return "よし決まりだ、お嬢ちゃん。俺がツッコんで道を作る、お前が突破する。並んで勝ちに行くぞ。";
+      if (state.trust >= 4) {
+        setAllImages(resolvedImages.happy || resolvedImages.normal);
+        return "いい目をしてる。なら俺も本気で付き合おう。";
       }
       if (state.trust >= 1) {
-        imageEl.src = resolvedImages.normal;
-        return "今回はまあ合格点だ。無茶は減らせ、でも覚悟はそのままでいい。俺が隣にいる。";
+        setAllImages(resolvedImages.normal);
+        return "悪くない。次はもう少し踏み込んでこい。";
       }
-      imageEl.src = resolvedImages.angry || resolvedImages.normal;
-      return "だから待てって言っただろお嬢ちゃん！！ ……ほんと世話が焼ける。でも最後まで付き合うからな。";
+      setAllImages(resolvedImages.angry || resolvedImages.normal);
+      return "…今日はここまでだ。出直してこい。";
     },
     choices: [
       { text: "もう一回プレイする", trust: 0, next: "start", reset: true },
+      { text: "ホームへ戻る", trust: 0, next: "start", reset: true, goHome: true },
       { text: "別ルートを試す", trust: 0, next: "start", reset: true },
-      { text: "信頼度を0にしてやり直す", trust: 0, next: "start", reset: true },
-      { text: "S太郎にもう一度ツッコまれる", trust: 0, next: "start", reset: true },
+      { text: "S太郎にツッコまれる", trust: 0, next: "start", reset: true },
     ],
   },
 };
@@ -134,11 +104,27 @@ async function pickFirstImage(candidates) {
   return "";
 }
 
+function setAllImages(src) {
+  if (!src) return;
+  gameImageEl.src = src;
+  homeImageEl.src = src;
+}
+
+function showHome() {
+  homeScreenEl.classList.remove("is-hidden");
+  gameScreenEl.classList.add("is-hidden");
+}
+
+function showGame() {
+  homeScreenEl.classList.add("is-hidden");
+  gameScreenEl.classList.remove("is-hidden");
+}
+
 function renderScene() {
   const scene = scenes[state.current];
   speakerEl.textContent = scene.speaker;
   lineEl.textContent = typeof scene.line === "function" ? scene.line() : scene.line;
-  trustEl.textContent = state.trust;
+  trustEl.textContent = String(Math.max(0, state.trust * 20));
   choicesEl.innerHTML = "";
 
   scene.choices.forEach((choice) => {
@@ -149,9 +135,12 @@ function renderScene() {
     button.addEventListener("click", () => {
       if (choice.reset) {
         state.trust = 0;
-        imageEl.src = resolvedImages.normal;
+        setAllImages(resolvedImages.normal);
       } else {
         state.trust += choice.trust;
+      }
+      if (choice.goHome) {
+        showHome();
       }
       state.current = choice.next;
       renderScene();
@@ -174,20 +163,32 @@ bgmToggle.addEventListener("click", async () => {
   }
 });
 
+startGameBtn.addEventListener("click", () => {
+  showGame();
+  state.current = "start";
+  renderScene();
+});
+
+backHomeBtn.addEventListener("click", () => {
+  showHome();
+});
+
 async function init() {
   resolvedImages.normal = await pickFirstImage(imageSets.normal);
   resolvedImages.happy = await pickFirstImage(imageSets.happy);
   resolvedImages.angry = await pickFirstImage(imageSets.angry);
 
   if (resolvedImages.normal) {
-    imageEl.src = resolvedImages.normal;
-    stageEl.classList.remove("stage--no-image");
+    setAllImages(resolvedImages.normal);
+    gameMainEl.classList.remove("stage--no-image");
+    homeMainEl.classList.remove("stage--no-image");
   } else {
-    imageEl.removeAttribute("src");
-    stageEl.classList.add("stage--no-image");
+    gameMainEl.classList.add("stage--no-image");
+    homeMainEl.classList.add("stage--no-image");
   }
 
   renderScene();
+  showHome();
 }
 
 init();
