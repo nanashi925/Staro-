@@ -2,6 +2,7 @@
 
 - `images/`: 画像ファイルの保存場所
   - 優先ファイル名（どれか1つあれば表示）:
+    - `S太郎おじさん.PNG`
     - `S太郎-煙草.PNG`
     - `S太郎-口閉じスマイル.PNG`
     - `s_taro.png`, `s_taro.webp`, `s_taro.jpg`, `staro.png`, `S太郎.png`, `main.png`

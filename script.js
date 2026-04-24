@@ -16,9 +16,9 @@ const bgmToggle = document.getElementById("bgm-toggle");
 const state = { trust: 0, current: "start" };
 
 const imageSets = {
-  normal: ["./assets/images/S太郎-煙草.PNG", "./assets/images/S太郎-口閉じスマイル.PNG", "./assets/images/s_taro.png"],
-  happy: ["./assets/images/S太郎-口閉じスマイル.PNG", "./assets/images/s_taro_happy.png"],
-  angry: ["./assets/images/S太郎-煙草.PNG", "./assets/images/s_taro_angry.png"],
+  normal: ["./assets/images/S太郎おじさん.PNG", "./assets/images/S太郎-煙草.PNG", "./assets/images/S太郎-口閉じスマイル.PNG", "./assets/images/s_taro.png"],
+  happy: ["./assets/images/S太郎おじさん.PNG", "./assets/images/S太郎-口閉じスマイル.PNG", "./assets/images/s_taro_happy.png"],
+  angry: ["./assets/images/S太郎おじさん.PNG", "./assets/images/S太郎-煙草.PNG", "./assets/images/s_taro_angry.png"],
 };
 
 const resolvedImages = { normal: "", happy: "", angry: "" };
