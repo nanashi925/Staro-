@@ -17,6 +17,11 @@ const state = {
   trust: 0,
   runawayCount: 0,
   current: "talk1",
+  intent: "",
+  supportStyle: "",
+  planScore: 0,
+  drinkChoice: "",
+  finalAction: "",
 };
 
 function unique(items) {
@@ -37,119 +42,138 @@ function buildImageCandidates() {
   ]);
 }
 
-const imageSets = {
-  normal: buildImageCandidates(),
-};
-
+const imageSets = { normal: buildImageCandidates() };
 const resolvedImages = { normal: "" };
+
+function intentLabel() {
+  if (state.intent === "work") return "依頼";
+  if (state.intent === "consult") return "相談";
+  if (state.intent === "chat") return "雑談";
+  if (state.intent === "run") return "逃走";
+  return "未設定";
+}
+
+function endingLine() {
+  if (state.runawayCount >= 2 || state.finalAction === "withdraw") {
+    return "逃げてもいい。戻る場所を覚えてるなら、それでいい。次は戻った瞬間から立て直す。";
+  }
+
+  if (state.trust >= 14 && state.finalAction === "commit") {
+    return "上出来だ。今日は相棒として合格だな。お嬢ちゃんの判断、現場でも通用する。";
+  }
+
+  if (state.intent === "chat" && state.trust >= 8) {
+    return "雑談から本題を拾えた。悪くない。情報整理の筋が通ってる。";
+  }
+
+  if (state.trust >= 8) {
+    return "悪くない。迷っても戻ってこられるなら十分だ。次は精度を一段上げるぞ。";
+  }
+
+  return "今日はここまでだ。次はもう少し本音を置いていけ。俺はその整理から付き合う。";
+}
 
 const scenes = {
   talk1: {
     speaker: "S太郎",
     line: "待たせたな。で、俺に何の用だ？",
     choices: [
-      { text: "仕事の依頼にきました", trust: 2, next: "talk2" },
-      { text: "まず話を聞いてほしい", trust: 1, next: "talk2" },
-      { text: "S太郎、今日も不憫だね", trust: 0, next: "talk2" },
-      { text: "何でもありません", trust: -2, runaway: 1, next: "talk2" },
+      { text: "仕事の依頼にきました", trust: 2, intent: "work", next: "talk2" },
+      { text: "まず話を聞いてほしい", trust: 1, intent: "consult", next: "talk2" },
+      { text: "S太郎、今日も不憫だね", trust: 0, intent: "chat", next: "talk2" },
+      { text: "何でもありません", trust: -2, runaway: 1, intent: "run", next: "talk2" },
     ],
   },
   talk2: {
     speaker: "S太郎",
-    line: "了解。仕事、相談、雑談、逃亡未遂…どれでも処理はできる。だが順番は守れ、お嬢ちゃん。",
+    line: () => `了解。現在の分類は「${intentLabel()}」だ。順番を守れば、俺が道筋を作る。`,
     choices: [
-      { text: "目的から整理してほしい", trust: 2, next: "talk3" },
-      { text: "今日の予定を組んで", trust: 2, next: "talk3" },
-      { text: "まず雑談で落ち着きたい", trust: 0, next: "talk3" },
+      { text: "目的から整理してほしい", trust: 2, plan: 2, next: "talk3" },
+      { text: "今日の予定を組んで", trust: 2, plan: 2, next: "talk3" },
+      { text: "まず雑談で落ち着きたい", trust: 0, plan: 0, next: "talk3" },
       { text: "やっぱり帰る", trust: -2, runaway: 1, next: "talk3" },
     ],
   },
   talk3: {
     speaker: "S太郎",
-    line: "まず目的、次に期限、最後に捨てるものを決める。全部守ろうとする奴から順に潰れる。",
+    line: () => {
+      if (state.intent === "work") return "仕事か。いいだろう。条件を言え。甘い見積もりなら、その場で突き返す。";
+      if (state.intent === "consult") return "話なら聞く。だが俺は飾り棚の置物じゃない。次の手まで一緒に考える。";
+      if (state.intent === "chat") return "開幕から不憫扱いとはな。…まあいい、雑談にも情報は埋まってる。拾っていくぞ。";
+      return "逃げ足が速いのは悪くない。だが戻る時の入口は決めておけ。";
+    },
     choices: [
-      { text: "目的と期限を先に決める", trust: 2, next: "talk4" },
-      { text: "全部同時にやりたい", trust: -1, next: "talk4" },
-      { text: "捨てるものの判断を任せる", trust: 1, next: "talk4" },
-      { text: "今は考えたくない", trust: -2, runaway: 1, next: "talk4" },
+      { text: "期限と優先順位を決める", trust: 2, plan: 2, next: "talk4" },
+      { text: "全部同時に進めたい", trust: -1, plan: -1, next: "talk4" },
+      { text: "必要な情報だけ抽出して", trust: 1, plan: 1, next: "talk4" },
+      { text: "いったん保留したい", trust: -1, runaway: 1, next: "talk4" },
     ],
   },
   talk4: {
     speaker: "S太郎",
-    line: "俺は操縦席を奪うためにいるんじゃない。隣の席で地図を広げるためにいる。相棒としてな。",
+    line: "俺は操縦席を奪うためにいるんじゃない。隣の席で地図を広げるためにいる。",
     choices: [
-      { text: "隣で見てて", trust: 2, next: "talk5" },
-      { text: "先導してほしい", trust: 1, next: "talk5" },
-      { text: "全部決めてほしい", trust: -1, next: "talk5" },
+      { text: "隣で見てて", trust: 2, supportStyle: "partner", next: "talk5" },
+      { text: "先回りして道を示して", trust: 1, supportStyle: "lead", next: "talk5" },
+      { text: "全部決めてほしい", trust: -1, supportStyle: "depend", next: "talk5" },
     ],
   },
   talk5: {
     speaker: "S太郎",
     line: "秘書としてなら、予定管理と情報整理は俺が受け持つ。だが最後に選ぶのはお嬢ちゃんだ。",
     choices: [
-      { text: "今日の予定を組んで", trust: 2, next: "talk6" },
-      { text: "情報を3行で要約して", trust: 2, next: "talk6" },
-      { text: "とりあえず勢いで行こう", trust: -1, next: "talk6" },
-      { text: "後で考える", trust: -1, next: "talk6" },
+      { text: "午前に資料整理、午後に実行で", trust: 2, plan: 2, next: "talk6" },
+      { text: "期限だけ決めて柔軟に", trust: 1, plan: 1, next: "talk6" },
+      { text: "予定は後で考える", trust: -1, plan: -1, next: "talk6" },
+      { text: "とにかく勢いで", trust: -2, plan: -2, next: "talk6" },
     ],
   },
   talk6: {
     speaker: "S太郎",
     line: "で、今の本音はどれだ。不安か、強がりか、いつもの茶化しか。",
     choices: [
-      { text: "正直、不安です", trust: 2, next: "talk7" },
-      { text: "余裕です。たぶん", trust: 0, next: "talk7" },
+      { text: "不安です。整理してほしい", trust: 2, next: "talk7" },
+      { text: "余裕です。多分", trust: 0, next: "talk7" },
       { text: "S太郎が不憫で安心する", trust: 0, next: "talk7" },
-      { text: "やっぱり逃げたい", trust: -2, runaway: 1, next: "talk7" },
+      { text: "ちょっと逃げたい", trust: -2, runaway: 1, next: "talk7" },
     ],
   },
   talk7: {
     speaker: "S太郎",
-    line: "開幕から不憫扱いか。いい度胸だな、お嬢ちゃん。…だが核心は外すな。お前が今やるべき一手を選べ。",
+    line: "安心しろ。俺は前に出すぎない。だが倒れそうなら襟首くらい掴む。で、核心を選べ。",
     choices: [
-      { text: "優先タスク1件に絞る", trust: 2, next: "talk8" },
-      { text: "全部同時に片付ける", trust: -1, next: "talk8" },
-      { text: "まず相談メモを作る", trust: 1, next: "talk8" },
+      { text: "優先タスク1件に絞る", trust: 2, plan: 2, next: "talk8" },
+      { text: "情報を追加で集める", trust: 1, plan: 1, next: "talk8" },
+      { text: "全部同時にやる", trust: -1, plan: -1, next: "talk8" },
     ],
   },
   talk8: {
     speaker: "S太郎",
-    line: "バーテンダーとしてなら、今日は強い酒じゃなく温い紅茶だ。胃が先に降伏してる顔だぞ。",
+    line: "バーテンダーとしてなら、今日は強い酒じゃなくて温い紅茶だな。胃が先に降伏してる顔だ。",
     choices: [
-      { text: "紅茶をください", trust: 2, next: "talk9" },
-      { text: "水で十分", trust: 1, next: "talk9" },
-      { text: "気合いで何とかする", trust: -1, next: "talk9" },
-      { text: "何も要らない", trust: -1, next: "talk9" },
+      { text: "紅茶をください", trust: 2, drink: "tea", next: "talk9" },
+      { text: "水でお願いします", trust: 1, drink: "water", next: "talk9" },
+      { text: "気合いで進める", trust: -1, drink: "none", next: "talk9" },
+      { text: "何も要らない", trust: -1, drink: "none", next: "talk9" },
     ],
   },
   talk9: {
     speaker: "S太郎",
-    line: "一息ついたな。次の動きだ。選べ、お嬢ちゃん。俺は隣で支える。",
+    line: () => `準備完了だ。分類:${intentLabel()} / 予定精度:${state.planScore} / 飲み物:${state.drinkChoice || "未選択"}。次を決めろ。`,
     choices: [
-      { text: "仕事の依頼を正式に出す", trust: 2, next: "talk10" },
-      { text: "もう一回最初から話す", trust: 0, next: "talk1", resetRunaway: false },
-      { text: "ホームへ戻る", trust: 0, next: "talk10", goHome: true },
-      { text: "今日はここで切り上げる", trust: -1, runaway: 1, next: "talk10" },
+      { text: "この計画で実行する", trust: 2, finalAction: "commit", next: "talk10" },
+      { text: "もう一回最初から話す", trust: 0, finalAction: "retry", next: "talk1" },
+      { text: "少し修正してから進む", trust: 1, finalAction: "adjust", next: "talk10" },
+      { text: "今日は撤退する", trust: -1, runaway: 1, finalAction: "withdraw", next: "talk10" },
     ],
   },
   talk10: {
     speaker: "S太郎",
-    line: () => {
-      if (state.runawayCount >= 3) {
-        return "逃げてもいい。戻る場所を覚えてるなら、それでいい。次に戻った時は、最短で立て直す。";
-      }
-      if (state.trust >= 12) {
-        return "上出来だ。今日は相棒として合格だな。…まあ、俺を酷使した分の紅茶代は請求するがな。";
-      }
-      if (state.trust >= 6) {
-        return "悪くない。迷っても戻ってこられるなら十分だ。次は精度を一段上げるぞ。";
-      }
-      return "今日はここまでだ。次はもう少し本音を置いていけ。俺はその整理から付き合う。";
-    },
+    line: endingLine,
     choices: [
       { text: "もう一回プレイする", resetAll: true, next: "talk1" },
       { text: "ホームへ戻る", resetAll: true, next: "talk1", goHome: true },
-      { text: "続きから再挑戦する", resetAll: true, next: "talk2" },
+      { text: "続きから再挑戦する", resetAll: true, next: "talk3" },
     ],
   },
 };
@@ -191,6 +215,14 @@ function trustToPercent() {
   return Math.max(0, Math.min(100, state.trust * 5));
 }
 
+function resetMeta() {
+  state.intent = "";
+  state.supportStyle = "";
+  state.planScore = 0;
+  state.drinkChoice = "";
+  state.finalAction = "";
+}
+
 function renderScene() {
   const scene = scenes[state.current];
   speakerEl.textContent = scene.speaker;
@@ -207,12 +239,17 @@ function renderScene() {
       if (choice.resetAll) {
         state.trust = 0;
         state.runawayCount = 0;
+        resetMeta();
       } else {
         state.trust += choice.trust || 0;
       }
 
       if (choice.runaway) state.runawayCount += choice.runaway;
-      if (choice.resetRunaway) state.runawayCount = 0;
+      if (choice.intent) state.intent = choice.intent;
+      if (choice.supportStyle) state.supportStyle = choice.supportStyle;
+      if (typeof choice.plan === "number") state.planScore += choice.plan;
+      if (choice.drink) state.drinkChoice = choice.drink;
+      if (choice.finalAction) state.finalAction = choice.finalAction;
 
       if (choice.goHome) showHome();
 
