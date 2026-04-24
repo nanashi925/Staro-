@@ -14,6 +14,8 @@ const state = {
 
 const imageSets = {
   normal: [
+    "./assets/images/S太郎-煙草.PNG",
+    "./assets/images/S太郎-口閉じスマイル.PNG",
     "./assets/images/s_taro.png",
     "./assets/images/s_taro.webp",
     "./assets/images/s_taro.jpg",
@@ -22,11 +24,13 @@ const imageSets = {
     "./assets/images/main.png",
   ],
   happy: [
+    "./assets/images/S太郎-口閉じスマイル.PNG",
     "./assets/images/s_taro_happy.png",
     "./assets/images/s_taro_smile.png",
     "./assets/images/S太郎_happy.png",
   ],
   angry: [
+    "./assets/images/S太郎-煙草.PNG",
     "./assets/images/s_taro_angry.png",
     "./assets/images/s_taro_serious.png",
     "./assets/images/S太郎_angry.png",

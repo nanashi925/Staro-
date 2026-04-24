@@ -136,8 +136,6 @@ button {
   padding: 1rem 1.1rem 1.15rem;
   z-index: 2;
   background: linear-gradient(180deg, #00000000 0%, #07080fba 22%, #05060cf2 55%, #07070df8 100%);
-  background:
-    linear-gradient(180deg, #00000000 0%, #07080fba 22%, #05060cf2 55%, #07070df8 100%);
   border-top: 1px solid #ffffff33;
 }
 
