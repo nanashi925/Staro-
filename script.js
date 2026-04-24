@@ -13,7 +13,11 @@ const backHomeBtn = document.getElementById("back-home");
 const bgm = document.getElementById("bgm");
 const bgmToggle = document.getElementById("bgm-toggle");
 
-const state = { trust: 0, current: "start" };
+const state = {
+  trust: 0,
+  runawayCount: 0,
+  current: "talk1",
+};
 
 function unique(items) {
   return [...new Set(items.filter(Boolean))];
@@ -30,78 +34,122 @@ function buildImageCandidates() {
     encodeURI(`./assets/images/${fileNfd}`),
     "./assets/images/S太郎-煙草.PNG",
     "./assets/images/S太郎-口閉じスマイル.PNG",
-    "./assets/images/s_taro.png",
   ]);
 }
 
 const imageSets = {
   normal: buildImageCandidates(),
-  happy: buildImageCandidates(),
-  angry: buildImageCandidates(),
 };
 
-const resolvedImages = { normal: "", happy: "", angry: "" };
+const resolvedImages = { normal: "" };
 
 const scenes = {
-  start: {
+  talk1: {
     speaker: "S太郎",
-    line: "待たせたな。…で、俺に何の用だ？",
+    line: "待たせたな。で、俺に何の用だ？",
     choices: [
-      { text: "1. 仕事の依頼にきました。", trust: 2, next: "plan" },
-      { text: "2. あなたについて知りたい。", trust: 1, next: "care" },
-      { text: "3. 何でもありません。", trust: -1, next: "solo" },
-      { text: "4. …失礼します。", trust: -2, next: "end" },
+      { text: "仕事の依頼にきました", trust: 2, next: "talk2" },
+      { text: "まず話を聞いてほしい", trust: 1, next: "talk2" },
+      { text: "S太郎、今日も不憫だね", trust: 0, next: "talk2" },
+      { text: "何でもありません", trust: -2, runaway: 1, next: "talk2" },
     ],
   },
-  plan: {
+  talk2: {
     speaker: "S太郎",
-    line: "仕事か。いいだろう。だが中途半端は嫌いだ。覚悟はあるな？",
+    line: "了解。仕事、相談、雑談、逃亡未遂…どれでも処理はできる。だが順番は守れ、お嬢ちゃん。",
     choices: [
-      { text: "覚悟はできています", trust: 2, next: "end" },
-      { text: "少し怖いです", trust: 1, next: "end" },
-      { text: "やっぱりやめます", trust: -2, next: "end" },
-      { text: "最初に戻る", trust: 0, next: "start" },
+      { text: "目的から整理してほしい", trust: 2, next: "talk3" },
+      { text: "今日の予定を組んで", trust: 2, next: "talk3" },
+      { text: "まず雑談で落ち着きたい", trust: 0, next: "talk3" },
+      { text: "やっぱり帰る", trust: -2, runaway: 1, next: "talk3" },
     ],
   },
-  solo: {
+  talk3: {
     speaker: "S太郎",
-    line: "…お嬢ちゃん、無茶はするな。待て待て待て！！ 俺の前では特にだ。",
+    line: "まず目的、次に期限、最後に捨てるものを決める。全部守ろうとする奴から順に潰れる。",
     choices: [
-      { text: "わかった。あなたを頼る", trust: 2, next: "end" },
-      { text: "ひとりで行く", trust: -2, next: "end" },
-      { text: "最初に戻る", trust: 0, next: "start" },
-      { text: "黙って頷く", trust: 1, next: "end" },
+      { text: "目的と期限を先に決める", trust: 2, next: "talk4" },
+      { text: "全部同時にやりたい", trust: -1, next: "talk4" },
+      { text: "捨てるものの判断を任せる", trust: 1, next: "talk4" },
+      { text: "今は考えたくない", trust: -2, runaway: 1, next: "talk4" },
     ],
   },
-  care: {
+  talk4: {
     speaker: "S太郎",
-    line: "物好きだな。だが嫌いじゃない。聞きたいことがあるなら、座って話せ。",
+    line: "俺は操縦席を奪うためにいるんじゃない。隣の席で地図を広げるためにいる。相棒としてな。",
     choices: [
-      { text: "もっと知りたい", trust: 2, next: "end" },
-      { text: "十分です", trust: 1, next: "end" },
-      { text: "少し怖くなった", trust: -1, next: "end" },
-      { text: "最初に戻る", trust: 0, next: "start" },
+      { text: "隣で見てて", trust: 2, next: "talk5" },
+      { text: "先導してほしい", trust: 1, next: "talk5" },
+      { text: "全部決めてほしい", trust: -1, next: "talk5" },
     ],
   },
-  end: {
+  talk5: {
+    speaker: "S太郎",
+    line: "秘書としてなら、予定管理と情報整理は俺が受け持つ。だが最後に選ぶのはお嬢ちゃんだ。",
+    choices: [
+      { text: "今日の予定を組んで", trust: 2, next: "talk6" },
+      { text: "情報を3行で要約して", trust: 2, next: "talk6" },
+      { text: "とりあえず勢いで行こう", trust: -1, next: "talk6" },
+      { text: "後で考える", trust: -1, next: "talk6" },
+    ],
+  },
+  talk6: {
+    speaker: "S太郎",
+    line: "で、今の本音はどれだ。不安か、強がりか、いつもの茶化しか。",
+    choices: [
+      { text: "正直、不安です", trust: 2, next: "talk7" },
+      { text: "余裕です。たぶん", trust: 0, next: "talk7" },
+      { text: "S太郎が不憫で安心する", trust: 0, next: "talk7" },
+      { text: "やっぱり逃げたい", trust: -2, runaway: 1, next: "talk7" },
+    ],
+  },
+  talk7: {
+    speaker: "S太郎",
+    line: "開幕から不憫扱いか。いい度胸だな、お嬢ちゃん。…だが核心は外すな。お前が今やるべき一手を選べ。",
+    choices: [
+      { text: "優先タスク1件に絞る", trust: 2, next: "talk8" },
+      { text: "全部同時に片付ける", trust: -1, next: "talk8" },
+      { text: "まず相談メモを作る", trust: 1, next: "talk8" },
+    ],
+  },
+  talk8: {
+    speaker: "S太郎",
+    line: "バーテンダーとしてなら、今日は強い酒じゃなく温い紅茶だ。胃が先に降伏してる顔だぞ。",
+    choices: [
+      { text: "紅茶をください", trust: 2, next: "talk9" },
+      { text: "水で十分", trust: 1, next: "talk9" },
+      { text: "気合いで何とかする", trust: -1, next: "talk9" },
+      { text: "何も要らない", trust: -1, next: "talk9" },
+    ],
+  },
+  talk9: {
+    speaker: "S太郎",
+    line: "一息ついたな。次の動きだ。選べ、お嬢ちゃん。俺は隣で支える。",
+    choices: [
+      { text: "仕事の依頼を正式に出す", trust: 2, next: "talk10" },
+      { text: "もう一回最初から話す", trust: 0, next: "talk1", resetRunaway: false },
+      { text: "ホームへ戻る", trust: 0, next: "talk10", goHome: true },
+      { text: "今日はここで切り上げる", trust: -1, runaway: 1, next: "talk10" },
+    ],
+  },
+  talk10: {
     speaker: "S太郎",
     line: () => {
-      if (state.trust >= 4) {
-        setAllImages(resolvedImages.happy || resolvedImages.normal);
-        return "いい目をしてる。なら俺も本気で付き合おう。";
+      if (state.runawayCount >= 3) {
+        return "逃げてもいい。戻る場所を覚えてるなら、それでいい。次に戻った時は、最短で立て直す。";
       }
-      if (state.trust >= 1) {
-        setAllImages(resolvedImages.normal);
-        return "悪くない。次はもう少し踏み込んでこい。";
+      if (state.trust >= 12) {
+        return "上出来だ。今日は相棒として合格だな。…まあ、俺を酷使した分の紅茶代は請求するがな。";
       }
-      setAllImages(resolvedImages.angry || resolvedImages.normal);
-      return "…今日はここまでだ。出直してこい。";
+      if (state.trust >= 6) {
+        return "悪くない。迷っても戻ってこられるなら十分だ。次は精度を一段上げるぞ。";
+      }
+      return "今日はここまでだ。次はもう少し本音を置いていけ。俺はその整理から付き合う。";
     },
     choices: [
-      { text: "もう一回プレイする", trust: 0, next: "start", reset: true },
-      { text: "ホームへ戻る", trust: 0, next: "start", reset: true, goHome: true },
-      { text: "別ルートを試す", trust: 0, next: "start", reset: true },
-      { text: "S太郎にツッコまれる", trust: 0, next: "start", reset: true },
+      { text: "もう一回プレイする", resetAll: true, next: "talk1" },
+      { text: "ホームへ戻る", resetAll: true, next: "talk1", goHome: true },
+      { text: "続きから再挑戦する", resetAll: true, next: "talk2" },
     ],
   },
 };
@@ -139,11 +187,15 @@ function showGame() {
   gameScreenEl.classList.remove("is-hidden");
 }
 
+function trustToPercent() {
+  return Math.max(0, Math.min(100, state.trust * 5));
+}
+
 function renderScene() {
   const scene = scenes[state.current];
   speakerEl.textContent = scene.speaker;
   lineEl.textContent = typeof scene.line === "function" ? scene.line() : scene.line;
-  trustEl.textContent = String(Math.max(0, state.trust * 20));
+  trustEl.textContent = String(trustToPercent());
   choicesEl.innerHTML = "";
 
   scene.choices.forEach((choice) => {
@@ -152,13 +204,18 @@ function renderScene() {
     button.className = "choice";
     button.textContent = choice.text;
     button.addEventListener("click", () => {
-      if (choice.reset) {
+      if (choice.resetAll) {
         state.trust = 0;
-        setAllImages(resolvedImages.normal);
+        state.runawayCount = 0;
       } else {
-        state.trust += choice.trust;
+        state.trust += choice.trust || 0;
       }
+
+      if (choice.runaway) state.runawayCount += choice.runaway;
+      if (choice.resetRunaway) state.runawayCount = 0;
+
       if (choice.goHome) showHome();
+
       state.current = choice.next;
       renderScene();
     });
@@ -182,7 +239,7 @@ bgmToggle.addEventListener("click", async () => {
 
 startGameBtn.addEventListener("click", () => {
   showGame();
-  state.current = "start";
+  state.current = "talk1";
   renderScene();
 });
 
@@ -190,8 +247,6 @@ backHomeBtn.addEventListener("click", () => showHome());
 
 async function init() {
   resolvedImages.normal = await pickFirstImage(imageSets.normal);
-  resolvedImages.happy = await pickFirstImage(imageSets.happy);
-  resolvedImages.angry = await pickFirstImage(imageSets.angry);
 
   if (resolvedImages.normal) {
     setAllImages(resolvedImages.normal);
