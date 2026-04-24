@@ -3,12 +3,40 @@ const speakerEl = document.getElementById("speaker");
 const lineEl = document.getElementById("line");
 const choicesEl = document.getElementById("choices");
 const imageEl = document.getElementById("character-image");
+const stageEl = document.querySelector(".stage");
 const bgm = document.getElementById("bgm");
 const bgmToggle = document.getElementById("bgm-toggle");
 
 const state = {
   trust: 0,
   current: "start",
+};
+
+const imageSets = {
+  normal: [
+    "./assets/images/s_taro.png",
+    "./assets/images/s_taro.webp",
+    "./assets/images/s_taro.jpg",
+    "./assets/images/staro.png",
+    "./assets/images/S太郎.png",
+    "./assets/images/main.png",
+  ],
+  happy: [
+    "./assets/images/s_taro_happy.png",
+    "./assets/images/s_taro_smile.png",
+    "./assets/images/S太郎_happy.png",
+  ],
+  angry: [
+    "./assets/images/s_taro_angry.png",
+    "./assets/images/s_taro_serious.png",
+    "./assets/images/S太郎_angry.png",
+  ],
+};
+
+const resolvedImages = {
+  normal: "",
+  happy: "",
+  angry: "",
 };
 
 const scenes = {
@@ -66,14 +94,14 @@ const scenes = {
     speaker: "S太郎",
     line: () => {
       if (state.trust >= 5) {
-        imageEl.src = "./assets/images/s_taro_happy.png";
+        imageEl.src = resolvedImages.happy || resolvedImages.normal;
         return "よし決まりだ、お嬢ちゃん。俺がツッコんで道を作る、お前が突破する。並んで勝ちに行くぞ。";
       }
       if (state.trust >= 1) {
-        imageEl.src = "./assets/images/s_taro.png";
+        imageEl.src = resolvedImages.normal;
         return "今回はまあ合格点だ。無茶は減らせ、でも覚悟はそのままでいい。俺が隣にいる。";
       }
-      imageEl.src = "./assets/images/s_taro_angry.png";
+      imageEl.src = resolvedImages.angry || resolvedImages.normal;
       return "だから待てって言っただろお嬢ちゃん！！ ……ほんと世話が焼ける。でも最後まで付き合うからな。";
     },
     choices: [
@@ -84,6 +112,23 @@ const scenes = {
     ],
   },
 };
+
+function loadImage(src) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(src);
+    img.onerror = () => resolve("");
+    img.src = src;
+  });
+}
+
+async function pickFirstImage(candidates) {
+  for (const src of candidates) {
+    const ok = await loadImage(src);
+    if (ok) return ok;
+  }
+  return "";
+}
 
 function renderScene() {
   const scene = scenes[state.current];
@@ -100,7 +145,7 @@ function renderScene() {
     button.addEventListener("click", () => {
       if (choice.reset) {
         state.trust = 0;
-        imageEl.src = "./assets/images/s_taro.png";
+        imageEl.src = resolvedImages.normal;
       } else {
         state.trust += choice.trust;
       }
@@ -125,4 +170,20 @@ bgmToggle.addEventListener("click", async () => {
   }
 });
 
-renderScene();
+async function init() {
+  resolvedImages.normal = await pickFirstImage(imageSets.normal);
+  resolvedImages.happy = await pickFirstImage(imageSets.happy);
+  resolvedImages.angry = await pickFirstImage(imageSets.angry);
+
+  if (resolvedImages.normal) {
+    imageEl.src = resolvedImages.normal;
+    stageEl.classList.remove("stage--no-image");
+  } else {
+    imageEl.removeAttribute("src");
+    stageEl.classList.add("stage--no-image");
+  }
+
+  renderScene();
+}
+
+init();
