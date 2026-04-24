@@ -9,6 +9,7 @@
 body {
   margin: 0;
   color: var(--txt);
+  overflow-x: hidden;
   background: radial-gradient(circle at 70% 10%, #3d2411 0%, transparent 35%), #080604;
 }
 .app-shell {
@@ -104,9 +105,17 @@ body {
 }
 
 @media (max-width: 1000px) {
-  .screen--home,
-  .screen--game { grid-template-columns: 1fr; }
-  .home-center, .game-main { min-height: 66vh; }
+  .screen--home { grid-template-columns: 1fr; }
+  .screen--game { display: block; }
+  .home-center, .game-main { min-height: 78vh; }
+  .game-side {
+    position: absolute;
+    top: 0.55rem;
+    right: 0.55rem;
+    width: min(38vw, 260px);
+    z-index: 4;
+    gap: 0.35rem;
+  }
 }
 @media (max-width: 760px) {
   .home-left h1 { font-size: 2.2rem; }
@@ -117,21 +126,12 @@ body {
   .choice { font-size: 1rem; }
   .card p { font-size: 0.9rem; }
 
-  .screen--game {
-    display: block;
-  }
-
   .game-main {
     min-height: 78vh;
   }
 
   .game-side {
-    position: absolute;
-    top: 0.55rem;
-    right: 0.55rem;
-    width: 40%;
-    z-index: 4;
-    gap: 0.35rem;
+    width: min(42vw, 220px);
   }
 
   .game-side .card {

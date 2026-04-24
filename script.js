@@ -174,18 +174,14 @@ backHomeBtn.addEventListener("click", () => {
 });
 
 async function init() {
-  resolvedImages.normal = await pickFirstImage(imageSets.normal);
-  resolvedImages.happy = await pickFirstImage(imageSets.happy);
-  resolvedImages.angry = await pickFirstImage(imageSets.angry);
+  const preferred = "./assets/images/S太郎おじさん.PNG";
+  resolvedImages.normal = preferred;
+  resolvedImages.happy = preferred;
+  resolvedImages.angry = preferred;
 
-  if (resolvedImages.normal) {
-    setAllImages(resolvedImages.normal);
-    gameMainEl.classList.remove("stage--no-image");
-    homeMainEl.classList.remove("stage--no-image");
-  } else {
-    gameMainEl.classList.add("stage--no-image");
-    homeMainEl.classList.add("stage--no-image");
-  }
+  setAllImages(preferred);
+  gameMainEl.classList.remove("stage--no-image");
+  homeMainEl.classList.remove("stage--no-image");
 
   renderScene();
   showHome();
