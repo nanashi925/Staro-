@@ -15,10 +15,29 @@ const bgmToggle = document.getElementById("bgm-toggle");
 
 const state = { trust: 0, current: "start" };
 
+function unique(items) {
+  return [...new Set(items.filter(Boolean))];
+}
+
+function buildImageCandidates() {
+  const file = "S太郎おじさん.PNG";
+  const fileNfd = file.normalize("NFD");
+
+  return unique([
+    `./assets/images/${file}`,
+    encodeURI(`./assets/images/${file}`),
+    `./assets/images/${fileNfd}`,
+    encodeURI(`./assets/images/${fileNfd}`),
+    "./assets/images/S太郎-煙草.PNG",
+    "./assets/images/S太郎-口閉じスマイル.PNG",
+    "./assets/images/s_taro.png",
+  ]);
+}
+
 const imageSets = {
-  normal: ["./assets/images/S太郎おじさん.PNG", "./assets/images/S太郎-煙草.PNG", "./assets/images/S太郎-口閉じスマイル.PNG", "./assets/images/s_taro.png"],
-  happy: ["./assets/images/S太郎おじさん.PNG", "./assets/images/S太郎-口閉じスマイル.PNG", "./assets/images/s_taro_happy.png"],
-  angry: ["./assets/images/S太郎おじさん.PNG", "./assets/images/S太郎-煙草.PNG", "./assets/images/s_taro_angry.png"],
+  normal: buildImageCandidates(),
+  happy: buildImageCandidates(),
+  angry: buildImageCandidates(),
 };
 
 const resolvedImages = { normal: "", happy: "", angry: "" };
@@ -139,9 +158,7 @@ function renderScene() {
       } else {
         state.trust += choice.trust;
       }
-      if (choice.goHome) {
-        showHome();
-      }
+      if (choice.goHome) showHome();
       state.current = choice.next;
       renderScene();
     });
@@ -169,19 +186,22 @@ startGameBtn.addEventListener("click", () => {
   renderScene();
 });
 
-backHomeBtn.addEventListener("click", () => {
-  showHome();
-});
+backHomeBtn.addEventListener("click", () => showHome());
 
 async function init() {
-  const preferred = "./assets/images/S太郎おじさん.PNG";
-  resolvedImages.normal = preferred;
-  resolvedImages.happy = preferred;
-  resolvedImages.angry = preferred;
+  resolvedImages.normal = await pickFirstImage(imageSets.normal);
+  resolvedImages.happy = await pickFirstImage(imageSets.happy);
+  resolvedImages.angry = await pickFirstImage(imageSets.angry);
 
-  setAllImages(preferred);
-  gameMainEl.classList.remove("stage--no-image");
-  homeMainEl.classList.remove("stage--no-image");
+  if (resolvedImages.normal) {
+    setAllImages(resolvedImages.normal);
+    gameMainEl.classList.remove("stage--no-image");
+    homeMainEl.classList.remove("stage--no-image");
+  } else {
+    console.error("S太郎画像が見つかりません。確認したパス:", imageSets.normal);
+    gameMainEl.classList.add("stage--no-image");
+    homeMainEl.classList.add("stage--no-image");
+  }
 
   renderScene();
   showHome();

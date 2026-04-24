@@ -63,8 +63,9 @@ body {
   object-fit: cover;
   background: radial-gradient(circle at 50% 40%, #2a1d16, #100c0a 65%, #090705 100%);
 }
+.stage--no-image .hero-image { opacity: 0; }
 .stage--no-image::after {
-  content: "画像を読み込み中...";
+  content: "画像が見つかりません";
   position: absolute; inset: 0; display: grid; place-items: center;
 }
 
