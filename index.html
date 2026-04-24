@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>S太郎ルート - 不憫なオッサンとお嬢ちゃん</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="game">
+      <header class="game__header">
+        <h1>S太郎ルート</h1>
+        <p>乙女ゲーム風ミニノベル</p>
+      </header>
+
+      <section class="stage">
+        <img
+          id="character-image"
+          class="stage__image"
+          src="./assets/images/s_taro.png"
+          alt="S太郎の立ち絵"
+        />
+
+        <div class="hud">
+          <p>信頼度: <span id="trust">0</span></p>
+          <button id="bgm-toggle" type="button">BGM再生</button>
+        </div>
+
+        <article class="dialogue-box">
+          <h2 id="speaker">S太郎</h2>
+          <p id="line"></p>
+        </article>
+      </section>
+
+      <section>
+        <div id="choices" class="choices"></div>
+      </section>
+
+      <footer class="game__footer">
+        <p>画像: <code>assets/images/</code> / 音楽: <code>assets/music/</code></p>
+      </footer>
+    </main>
+
+    <audio id="bgm" src="./assets/music/bgm.mp3" loop></audio>
+    <script src="./script.js" defer></script>
+  </body>
+</html>
